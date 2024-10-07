@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Modal } from 'react-bootstrap';
+import { Button, Modal, Form } from 'react-bootstrap';
+import DataTable from 'react-data-table-component';
 import { FaUserClock } from 'react-icons/fa';
 import axios from 'axios';
 import './styles.css';
@@ -8,16 +9,20 @@ const PendingUser = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [pendingUsers, setPendingUsers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Fetch pending users from the backend
   useEffect(() => {
-    axios.get('http://localhost:5000/api/users/pending')  // Fetching from backend
-      .then((response) => {
-        setPendingUsers(response.data); // Set the fetched users in state
-      })
-      .catch((error) => {
+    const fetchPendingUsers = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/users/pending');
+        setPendingUsers(response.data);
+      } catch (error) {
         console.error('Error fetching users:', error);
-      });
+      }
+    };
+
+    fetchPendingUsers();
   }, []);
 
   const handleOpenModal = (user) => {
@@ -30,52 +35,88 @@ const PendingUser = () => {
     setSelectedUser(null);
   };
 
-  const handleVerifyUser = () => {
+  const handleVerifyUser = async () => {
     if (selectedUser) {
-      axios.put(`http://localhost:5000/api/users/${selectedUser._id}/verify`)
-        .then(() => {
-          setPendingUsers(pendingUsers.map(user =>
+      try {
+        await axios.put(`http://localhost:5000/api/users/${selectedUser._id}/verify`);
+        setPendingUsers((prevUsers) =>
+          prevUsers.map((user) =>
             user._id === selectedUser._id ? { ...user, account_status: 'verified' } : user
-          ));
-          handleCloseModal();
-        })
-        .catch(error => {
-          console.error('Error verifying user:', error);
-        });
+          )
+        );
+        handleCloseModal();
+      } catch (error) {
+        console.error('Error verifying user:', error);
+      }
     }
   };
 
-  const handleRejectUser = () => {
+  const handleRejectUser = async () => {
     if (selectedUser) {
-      axios.put(`http://localhost:5000/api/users/${selectedUser._id}/reject`)
-        .then(() => {
-          setPendingUsers(pendingUsers.map(user =>
+      try {
+        await axios.put(`http://localhost:5000/api/users/${selectedUser._id}/reject`);
+        setPendingUsers((prevUsers) =>
+          prevUsers.map((user) =>
             user._id === selectedUser._id ? { ...user, account_status: 'rejected' } : user
-          ));
-          handleCloseModal();
-        })
-        .catch(error => {
-          console.error('Error rejecting user:', error);
-        });
+          )
+        );
+        handleCloseModal();
+      } catch (error) {
+        console.error('Error rejecting user:', error);
+      }
     }
   };
+
+  const columns = [
+    {
+      name: 'Name',
+      selector: (row) => `${row.fname} ${row.lname}`,
+      sortable: true,
+    },
+    {
+      name: 'Email',
+      selector: (row) => row.email,
+      sortable: true,
+    },
+    {
+      name: 'Account Status',
+      selector: (row) => row.account_status,
+      sortable: true,
+    },
+    {
+      name: 'Actions',
+      cell: (row) => (
+        <Button variant="primary" onClick={() => handleOpenModal(row)}>
+          <FaUserClock /> View Details
+        </Button>
+      ),
+    },
+  ];
+
+  const filteredUsers = pendingUsers.filter((user) => {
+    const fullName = `${user?.fname || ''} ${user?.lname || ''}`;
+    return fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+           (user?.email && user.email.toLowerCase().includes(searchTerm.toLowerCase()));
+  });
 
   return (
     <div className="content-container pending-user">
       <h2>Pending Users</h2>
-      <div className="user-list">
-        {pendingUsers.map((user) => (
-          <Card key={user._id} className="user-card">
-            <Card.Body>
-              <FaUserClock className="icon" />
-              <Card.Title>{user.fname} {user.lname}</Card.Title>
-              <Card.Text>Email: {user.email}</Card.Text>
-              <Card.Text>Account Status: {user.account_status}</Card.Text>
-              <Button variant="primary" onClick={() => handleOpenModal(user)}>View Details</Button>
-            </Card.Body>
-          </Card>
-        ))}
-      </div>
+      <Form.Control
+        type="text"
+        placeholder="Search by Name or Email"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="mb-3"
+      />
+      <DataTable
+        columns={columns}
+        data={filteredUsers} // Use the filtered users for the DataTable
+        pagination
+        highlightOnHover
+        striped 
+        responsive
+      />
 
       {/* Modal for user details */}
       <Modal show={showModal} onHide={handleCloseModal}>
@@ -90,8 +131,6 @@ const PendingUser = () => {
               <p>Contact: {selectedUser.contact}</p>
               <p>Date of Birth: {new Date(selectedUser.dateOfBirth).toLocaleDateString()}</p>
               <p>Account Status: {selectedUser.account_status}</p>
-
-              {/* Conditional rendering for valid ID placeholder */}
               {selectedUser.validID ? (
                 <p><strong>Valid ID:</strong> {selectedUser.validID}</p>
               ) : (

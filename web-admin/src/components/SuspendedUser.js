@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Modal } from 'react-bootstrap';
+import { Button, Modal, Form } from 'react-bootstrap';
+import DataTable from 'react-data-table-component';
 import { FaUserSlash } from 'react-icons/fa';
 import axios from 'axios';
 import './styles.css';
@@ -8,16 +9,20 @@ const SuspendedUser = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [suspendedUsers, setSuspendedUsers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Fetch suspended users from the backend
   useEffect(() => {
-    axios.get('http://localhost:5000/api/users/suspended') // Fetching from backend
-      .then((response) => {
+    const fetchSuspendedUsers = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/users/suspended'); // Fetching from backend
         setSuspendedUsers(response.data); // Set the fetched users in state
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error('Error fetching suspended users:', error);
-      });
+      }
+    };
+
+    fetchSuspendedUsers();
   }, []);
 
   const handleOpenModal = (user) => {
@@ -30,22 +35,55 @@ const SuspendedUser = () => {
     setSelectedUser(null);
   };
 
+  // Filter suspended users based on search term
+  const filteredUsers = suspendedUsers.filter(user =>
+    `${user.fname} ${user.lname}`.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const columns = [
+    {
+      name: 'Name',
+      selector: row => `${row.fname} ${row.lname}`,
+      sortable: true,
+    },
+    {
+      name: 'Email',
+      selector: row => row.email,
+      sortable: true,
+    },
+    {
+      name: 'Account Status',
+      selector: row => row.accounts_status || 'Suspended',
+      sortable: true,
+    },
+    {
+      name: 'Action',
+      cell: row => (
+        <Button variant="primary" onClick={() => handleOpenModal(row)}>
+          View Details
+        </Button>
+      ),
+    },
+  ];
+
   return (
     <div className="content-container suspended-user">
       <h2>Suspended Users</h2>
-      <div className="user-list">
-        {suspendedUsers.map((user) => (
-          <Card key={user._id} className="user-card">
-            <Card.Body>
-              <FaUserSlash className="icon" />
-              <Card.Title>{user.fname} {user.lname}</Card.Title>
-              <Card.Text>Email: {user.email}</Card.Text>
-              <Card.Text>Account Status: {user.accounts_status}</Card.Text>
-              <Button variant="primary" onClick={() => handleOpenModal(user)}>View Details</Button>
-            </Card.Body>
-          </Card>
-        ))}
-      </div>
+      <Form.Control
+        type="text"
+        placeholder="Search by name..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="mb-3"
+      />
+      <DataTable
+        columns={columns}
+        data={filteredUsers} // Use the filtered users
+        pagination
+        highlightOnHover
+        striped
+        responsive
+      />
 
       {/* Modal for user details */}
       <Modal show={showModal} onHide={handleCloseModal}>

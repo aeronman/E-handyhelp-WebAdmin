@@ -5,6 +5,13 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './components/styles.css';
+<link
+  rel="stylesheet"
+  href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+  integrity="sha384-DyZvY5g3pH1sm8+jjj5P+GJg6hQTuUSXezGwv5MwbEtFsUBXaCrO5F8FxgBQ6RjO"
+  crossorigin="anonymous"
+/>
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

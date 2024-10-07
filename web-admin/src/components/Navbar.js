@@ -11,7 +11,7 @@ const Navbar = ({ onLogout }) => {
     return (
         <div className="navbar">
             <div className="navbar-left">
-                <input type="text" placeholder="Search..." className="search-bar" />
+               
             </div>
             <div className="navbar-right">
                 <div className="notification-button" onClick={toggleDropdown}>

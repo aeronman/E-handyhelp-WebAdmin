@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Modal } from 'react-bootstrap';
+import { Button, Modal, Form } from 'react-bootstrap';
+import DataTable from 'react-data-table-component';
 import { FaUserCheck } from 'react-icons/fa';
 import axios from 'axios';
 import './styles.css';
@@ -8,16 +9,20 @@ const VerifiedUser = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [verifiedUsers, setVerifiedUsers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Fetch verified users from the backend
   useEffect(() => {
-    axios.get('http://localhost:5000/api/users/verified') // Fetching from backend
-      .then((response) => {
+    const fetchVerifiedUsers = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/users/verified'); // Fetching from backend
         setVerifiedUsers(response.data); // Set the fetched users in state
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error('Error fetching verified users:', error);
-      });
+      }
+    };
+
+    fetchVerifiedUsers();
   }, []);
 
   const handleOpenModal = (user) => {
@@ -30,22 +35,56 @@ const VerifiedUser = () => {
     setSelectedUser(null);
   };
 
+  // Filter verified users based on search term
+  const filteredUsers = verifiedUsers.filter(user =>
+    `${user.fname} ${user.lname}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const columns = [
+    {
+      name: 'Name',
+      selector: row => `${row.fname} ${row.lname}`,
+      sortable: true,
+    },
+    {
+      name: 'Email',
+      selector: row => row.email,
+      sortable: true,
+    },
+    {
+      name: 'Account Status',
+      selector: row => row.accounts_status,
+      sortable: true,
+    },
+    {
+      name: 'Action',
+      cell: row => (
+        <Button variant="primary" onClick={() => handleOpenModal(row)}>
+          View Details
+        </Button>
+      ),
+    },
+  ];
+
   return (
     <div className="content-container verified-user">
       <h2>Verified Users</h2>
-      <div className="user-list">
-        {verifiedUsers.map((user) => (
-          <Card key={user._id} className="user-card">
-            <Card.Body>
-              <FaUserCheck className="icon" />
-              <Card.Title>{user.fname} {user.lname}</Card.Title>
-              <Card.Text>Email: {user.email}</Card.Text>
-              <Card.Text>Account Status: {user.accounts_status}</Card.Text>
-              <Button variant="primary" onClick={() => handleOpenModal(user)}>View Details</Button>
-            </Card.Body>
-          </Card>
-        ))}
-      </div>
+      <Form.Control
+        type="text"
+        placeholder="Search by name or email..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="mb-3"
+      />
+      <DataTable
+        columns={columns}
+        data={filteredUsers} // Use the filtered users
+        pagination
+        highlightOnHover
+        striped
+        responsive
+      />
 
       {/* Modal for user details */}
       <Modal show={showModal} onHide={handleCloseModal}>

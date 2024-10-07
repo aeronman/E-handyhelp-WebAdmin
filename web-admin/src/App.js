@@ -17,6 +17,13 @@ import ViewFeedbacks from './components/ViewFeedbacks'
 import { Container, Row, Col } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './components/styles.css';
+<link
+  rel="stylesheet"
+  href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+  integrity="sha384-DyZvY5g3pH1sm8+jjj5P+GJg6hQTuUSXezGwv5MwbEtFsUBXaCrO5F8FxgBQ6RjO"
+  crossorigin="anonymous"
+/>
+
 
 const App = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);

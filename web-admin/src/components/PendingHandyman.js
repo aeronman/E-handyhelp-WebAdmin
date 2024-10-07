@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Modal } from 'react-bootstrap';
-import { FaTools } from 'react-icons/fa';
+import { Button, Modal, Table , Form} from 'react-bootstrap';
 import axios from 'axios';
 import './styles.css';
 
@@ -8,10 +7,11 @@ const PendingHandyman = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedHandyman, setSelectedHandyman] = useState(null);
   const [pendingHandymen, setPendingHandymen] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Fetch pending handymen from the backend
   useEffect(() => {
-    axios.get('http://localhost:5000/api/handymen/pending')  // Fetching from backend
+    axios.get('http://localhost:5000/api/handymen/pending') // Fetching from backend
       .then((response) => {
         setPendingHandymen(response.data); // Set the fetched handymen in state
       })
@@ -60,21 +60,45 @@ const PendingHandyman = () => {
     }
   };
 
+  // Filtering handymen based on the search term
+  const filteredHandymen = pendingHandymen.filter((handyman) => {
+    const fullName = `${handyman?.fname || ''} ${handyman?.lname || ''}`;
+    return fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+           (handyman?.contact && handyman.contact.toLowerCase().includes(searchTerm.toLowerCase()));
+  });
+
   return (
     <div className="content-container pending-handyman">
       <h2>Pending Handymen</h2>
-      <div className="handyman-list">
-        {pendingHandymen.map((handyman) => (
-          <Card key={handyman._id} className="handyman-card">
-            <Card.Body>
-              <FaTools className="icon" />
-              <Card.Title>{handyman.fname} {handyman.lname}</Card.Title>
-              <Card.Text>{handyman.accounts_status || 'Pending Handyman'}</Card.Text>
-              <Button variant="primary" onClick={() => handleOpenModal(handyman)}>View Details</Button>
-            </Card.Body>
-          </Card>
-        ))}
-      </div>
+      <Form.Control
+        type="text"
+        placeholder="Search by Name or Contact"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="mb-3"
+      />
+      <Table striped bordered hover>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredHandymen.map((handyman) => (
+            <tr key={handyman._id}>
+              <td>{handyman.fname} {handyman.lname}</td>
+              <td>{handyman.accounts_status || 'Pending Handyman'}</td>
+              <td>
+                <Button variant="primary" onClick={() => handleOpenModal(handyman)}>
+                  View Details
+                </Button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
 
       {/* Modal for handyman details */}
       <Modal show={showModal} onHide={handleCloseModal}>
