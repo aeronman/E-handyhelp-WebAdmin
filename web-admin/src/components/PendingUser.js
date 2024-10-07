@@ -35,7 +35,7 @@ const PendingUser = () => {
       axios.put(`http://localhost:5000/api/users/${selectedUser._id}/verify`)
         .then(() => {
           setPendingUsers(pendingUsers.map(user =>
-            user._id === selectedUser._id ? { ...user, accounts_status: 'verified' } : user
+            user._id === selectedUser._id ? { ...user, account_status: 'verified' } : user
           ));
           handleCloseModal();
         })
@@ -70,7 +70,7 @@ const PendingUser = () => {
               <FaUserClock className="icon" />
               <Card.Title>{user.fname} {user.lname}</Card.Title>
               <Card.Text>Email: {user.email}</Card.Text>
-              <Card.Text>Account Status: {user.accounts_status}</Card.Text>
+              <Card.Text>Account Status: {user.account_status}</Card.Text>
               <Button variant="primary" onClick={() => handleOpenModal(user)}>View Details</Button>
             </Card.Body>
           </Card>
@@ -90,6 +90,13 @@ const PendingUser = () => {
               <p>Contact: {selectedUser.contact}</p>
               <p>Date of Birth: {new Date(selectedUser.dateOfBirth).toLocaleDateString()}</p>
               <p>Account Status: {selectedUser.account_status}</p>
+
+              {/* Conditional rendering for valid ID placeholder */}
+              {selectedUser.validID ? (
+                <p><strong>Valid ID:</strong> {selectedUser.validID}</p>
+              ) : (
+                <p><strong>Valid ID:</strong> <em>No ID provided</em></p>
+              )}
             </>
           )}
         </Modal.Body>

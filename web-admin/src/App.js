@@ -13,6 +13,7 @@ import PendingUser from './components/PendingUser';
 import VerifiedUser from './components/VerifiedUser';
 import RejectedUser from './components/RejectedUser';
 import SuspendedUser from './components/SuspendedUser';
+import ViewFeedbacks from './components/ViewFeedbacks'
 import { Container, Row, Col } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './components/styles.css';
@@ -65,6 +66,7 @@ const App = () => {
                                         <Route path="/users/verified" element={<VerifiedUser />} />
                                         <Route path="/users/rejected" element={<RejectedUser />} />
                                         <Route path="/users/suspended" element={<SuspendedUser />} />
+                                        <Route path="/view-feedbacks" element={<ViewFeedbacks />} />
                                     </Routes>
                                 </Col>
                             </Row>

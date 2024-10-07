@@ -5,6 +5,7 @@ const usersRoute = require('./routes/users');
 const handymenRoute = require('./routes/handymen'); 
 const dashboardRoute = require('./routes/dashboard');
 const reportRoute = require('./routes/reports');
+const feedbackRoute = require('./routes/feedbacks');
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use('/api/users', usersRoute); // Route for users
 app.use('/api/handymen', handymenRoute); // Route for handymen
 app.use('/api/dashboard', dashboardRoute); // Route for Dashboard
 app.use('/api/reports', reportRoute); // Route for Report
+app.use('/api/feedback', feedbackRoute); // Route for feedback
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

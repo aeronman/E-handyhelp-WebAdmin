@@ -88,6 +88,13 @@ const PendingHandyman = () => {
               <p>Description: {selectedHandyman.accounts_status || 'Pending Handyman'}</p>
               <p>Contact: {selectedHandyman.contact}</p>
               <p>Specialization: {selectedHandyman.specialization.join(', ')}</p>
+
+              {/* Conditional rendering for valid ID placeholder */}
+              {selectedHandyman.validID ? (
+                <p><strong>Valid ID:</strong> {selectedHandyman.validID}</p>
+              ) : (
+                <p><strong>Valid ID:</strong> <em>No ID provided</em></p>
+              )}
             </>
           )}
         </Modal.Body>

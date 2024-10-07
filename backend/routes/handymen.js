@@ -44,6 +44,7 @@ router.get('/verified', async (req, res) => {
       res.status(500).json({ message: err.message });
     }
   });
+  
 // Verify a handyman
 router.put('/:id/verify', async (req, res) => {
   try {

@@ -31,6 +31,7 @@ const AdminSidebar = () => {
                         <Link to="/users/suspended">Suspended Users</Link>
                     </div>
                 </li>
+                <li><Link to="/view-feedbacks">Feedbacks</Link></li>
             </ul>
         </div>
     );
