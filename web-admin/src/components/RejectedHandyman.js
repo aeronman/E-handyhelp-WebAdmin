@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Button, Modal, Form } from 'react-bootstrap';
 import DataTable from 'react-data-table-component';
 import axios from 'axios';
-import './styles.css';
+import './rejectedhandyman.css';
 
 const RejectedHandyman = () => {
   const [showModal, setShowModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false); // State for delete confirmation modal
   const [selectedHandyman, setSelectedHandyman] = useState(null);
   const [rejectedHandymen, setRejectedHandymen] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -34,10 +35,30 @@ const RejectedHandyman = () => {
     setSelectedHandyman(null);
   };
 
+  const handleOpenDeleteModal = (handyman) => {
+    setSelectedHandyman(handyman);
+    setShowDeleteModal(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setShowDeleteModal(false);
+    setSelectedHandyman(null);
+  };
+
+  // Function to handle the delete action
+  const handleDelete = async () => {
+    try {
+      await axios.delete(`http://localhost:5000/api/handymen/rejected/${selectedHandyman._id}`); // Make sure the API endpoint is correct
+      setRejectedHandymen(rejectedHandymen.filter(h => h._id !== selectedHandyman._id)); // Update state after deletion
+      handleCloseDeleteModal();
+    } catch (error) {
+      console.error('Error deleting handyman:', error);
+    }
+  };
+
   const filteredHandymen = rejectedHandymen.filter(handyman =>
     `${handyman.fname} ${handyman.lname}`.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
   const columns = [
     {
       name: 'Name',
@@ -57,12 +78,18 @@ const RejectedHandyman = () => {
     {
       name: 'Action',
       cell: row => (
-        <Button variant="primary" onClick={() => handleOpenModal(row)}>
-          View Details
-        </Button>
+        <div className="table-action-buttons">
+          <Button variant="primary" onClick={() => handleOpenModal(row)}>
+            View Details
+          </Button>
+          <Button variant="danger" onClick={() => handleOpenDeleteModal(row)}>
+            Delete
+          </Button>
+        </div>
       ),
     },
   ];
+  
 
   return (
     <div className="content-container rejected-handyman">
@@ -74,16 +101,18 @@ const RejectedHandyman = () => {
         onChange={(e) => setSearchTerm(e.target.value)}
         className="mb-3"
       />
-      <DataTable
-        columns={columns}
-        data={filteredHandymen} // Use filtered data for display
-        pagination
-        highlightOnHover
-        striped
-        responsive
-        searchable
-      />
-
+      <div style={{ overflowX: 'auto' }}> {/* Make the DataTable responsive */}
+        <DataTable
+          columns={columns}
+          data={filteredHandymen} // Use filtered data for display
+          pagination
+          highlightOnHover
+          striped
+          responsive
+          searchable
+        />
+      </div>
+  
       {/* Modal for handyman details */}
       <Modal show={showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
@@ -108,8 +137,27 @@ const RejectedHandyman = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+  
+      {/* Delete Confirmation Modal */}
+      <Modal show={showDeleteModal} onHide={handleCloseDeleteModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Delete</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete the handyman {selectedHandyman?.fname} {selectedHandyman?.lname}?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseDeleteModal}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={handleDelete}>
+            Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
+  
 };
 
 export default RejectedHandyman;

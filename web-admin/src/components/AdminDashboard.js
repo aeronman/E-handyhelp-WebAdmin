@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './styles.css';
+import './dashboardstyles.css';
 
 const AdminDashboard = () => {
     const [handymanTotal, setHandymanTotal] = useState(0);
@@ -10,7 +10,6 @@ const AdminDashboard = () => {
     const [suspendedUsersTotal, setSuspendedUsersTotal] = useState(0);
 
     useEffect(() => {
-        // Fetch data from the API
         const fetchTotals = async () => {
             try {
                 const response = await fetch('http://localhost:5000/api/dashboard/totals');
@@ -33,32 +32,34 @@ const AdminDashboard = () => {
     }, []);
 
     return (
-        <div className="admin-dashboard">
-            <h1>Welcome to the Admin Dashboard</h1>
-            <div className="dashboard-stats">
-                <div className="stat-box">
-                    <h3>Total Handymen</h3>
-                    <p>{handymanTotal}</p>
-                </div>
-                <div className="stat-box">
-                    <h3>Total Users</h3>
-                    <p>{usersTotal}</p>
-                </div>
-                <div className="stat-box">
-                    <h3>Pending Handymen Accounts</h3>
-                    <p>{pendingHandymenTotal}</p>
-                </div>
-                <div className="stat-box">
-                    <h3>Pending User Accounts</h3>
-                    <p>{pendingUsersTotal}</p>
-                </div>
-                <div className="stat-box">
-                    <h3>Suspended Handymen Accounts</h3>
-                    <p>{suspendedHandymenTotal}</p>
-                </div>
-                <div className="stat-box">
-                    <h3>Suspended User Accounts</h3>
-                    <p>{suspendedUsersTotal}</p>
+        <div className="d-flex justify-content-center align-items-center vh-100">
+            <div className="admin-dashboard text-center">
+                <h1>Welcome to the Admin Dashboard</h1>
+                <div className="dashboard-stats">
+                    <div className="stat-box">
+                        <h3>Total Handymen</h3>
+                        <p>{handymanTotal}</p>
+                    </div>
+                    <div className="stat-box">
+                        <h3>Total Users</h3>
+                        <p>{usersTotal}</p>
+                    </div>
+                    <div className="stat-box">
+                        <h3>Pending Handymen Accounts</h3>
+                        <p>{pendingHandymenTotal}</p>
+                    </div>
+                    <div className="stat-box">
+                        <h3>Pending User Accounts</h3>
+                        <p>{pendingUsersTotal}</p>
+                    </div>
+                    <div className="stat-box">
+                        <h3>Suspended Handymen Accounts</h3>
+                        <p>{suspendedHandymenTotal}</p>
+                    </div>
+                    <div className="stat-box">
+                        <h3>Suspended User Accounts</h3>
+                        <p>{suspendedUsersTotal}</p>
+                    </div>
                 </div>
             </div>
         </div>

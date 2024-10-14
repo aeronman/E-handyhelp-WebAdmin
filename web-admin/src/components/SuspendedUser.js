@@ -1,22 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Modal, Form } from 'react-bootstrap';
+import { Button, Modal, Form, Alert } from 'react-bootstrap';
 import DataTable from 'react-data-table-component';
-import { FaUserSlash } from 'react-icons/fa';
 import axios from 'axios';
 import './styles.css';
 
 const SuspendedUser = () => {
   const [showModal, setShowModal] = useState(false);
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [suspendedUsers, setSuspendedUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [alert, setAlert] = useState(null);
 
   // Fetch suspended users from the backend
   useEffect(() => {
     const fetchSuspendedUsers = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/users/suspended'); // Fetching from backend
-        setSuspendedUsers(response.data); // Set the fetched users in state
+        const response = await axios.get('http://localhost:5000/api/users/suspended');
+        setSuspendedUsers(response.data);
       } catch (error) {
         console.error('Error fetching suspended users:', error);
       }
@@ -33,6 +34,24 @@ const SuspendedUser = () => {
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedUser(null);
+  };
+
+  const handleConfirmDelete = () => {
+    setShowConfirmDelete(true);
+  };
+
+  const handleDeleteUser = async () => {
+    try {
+      await axios.delete(`http://localhost:5000/api/users/${selectedUser.id}`);
+      setSuspendedUsers(suspendedUsers.filter(user => user.id !== selectedUser.id));
+      setAlert({ type: 'success', message: 'User deleted successfully.' });
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      setAlert({ type: 'danger', message: 'Failed to delete user.' });
+    } finally {
+      setShowConfirmDelete(false);
+      setSelectedUser(null);
+    }
   };
 
   // Filter suspended users based on search term
@@ -58,10 +77,19 @@ const SuspendedUser = () => {
     },
     {
       name: 'Action',
+      selector: row => row.id, // Set a unique identifier
       cell: row => (
-        <Button variant="primary" onClick={() => handleOpenModal(row)}>
-          View Details
-        </Button>
+        <div className="action-cell">
+          <Button variant="primary" onClick={() => handleOpenModal(row)} className="btn">
+            View Details
+          </Button>
+          <Button variant="danger" onClick={() => { setSelectedUser(row); handleConfirmDelete(); }} className="btn">
+            Delete
+          </Button>
+          <Button variant="success" onClick={() => { /* Implement logic to lift suspension here */ }} className="btn">
+            Lift Suspension
+          </Button>
+        </div>
       ),
     },
   ];
@@ -78,12 +106,19 @@ const SuspendedUser = () => {
       />
       <DataTable
         columns={columns}
-        data={filteredUsers} // Use the filtered users
+        data={filteredUsers}
         pagination
         highlightOnHover
         striped
         responsive
       />
+
+      {/* Alert for success or error messages */}
+      {alert && (
+        <Alert variant={alert.type} onClose={() => setAlert(null)} dismissible>
+          {alert.message}
+        </Alert>
+      )}
 
       {/* Modal for user details */}
       <Modal show={showModal} onHide={handleCloseModal}>
@@ -103,6 +138,20 @@ const SuspendedUser = () => {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModal}>Close</Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Confirmation Modal for Deletion */}
+      <Modal show={showConfirmDelete} onHide={() => setShowConfirmDelete(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Deletion</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete {selectedUser?.fname} {selectedUser?.lname}?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowConfirmDelete(false)}>Cancel</Button>
+          <Button variant="danger" onClick={handleDeleteUser}>Delete</Button>
         </Modal.Footer>
       </Modal>
     </div>

@@ -1,0 +1,49 @@
+.view-reports-container {
+    max-width: 1200px; /* Set a max width for the reports container */
+    margin: 100px auto; /* Increased top margin */
+    padding: 20px; /* Increased padding */
+    background-color: #fff; /* Background color for contrast */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
+}
+
+.view-reports-title {
+    text-align: center; /* Center the title */
+    margin-bottom: 20px; /* Space below the title */
+}
+
+.reports-list {
+    display: flex;
+    flex-wrap: wrap; /* Allow cards to wrap onto the next line */
+    justify-content: center; /* Center items in the container */
+}
+
+.report-card {
+    margin: 10px; /* Margin around each card */
+    flex: 1 1 calc(25% - 20px); /* 4 cards in a row on larger screens */
+    min-width: 250px; /* Minimum width for cards */
+}
+
+/* Responsive styles for laptops and smaller screens */
+@media (max-width: 1024px) {
+    .report-card {
+        flex: 1 1 calc(33.33% - 20px); /* 3 cards in a row on medium screens */
+    }
+}
+
+@media (max-width: 768px) {
+    .report-card {
+        flex: 1 1 calc(50% - 20px); /* 2 cards in a row on smaller screens */
+    }
+}
+
+@media (max-width: 576px) {
+    .report-card {
+        flex: 1 1 100%; /* Stack cards in a single column on very small screens */
+    }
+}
+
+/* Modal styles (if needed) */
+.modal-body p {
+    margin-bottom: 10px; /* Space between paragraphs in modal */
+}

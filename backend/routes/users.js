@@ -64,4 +64,39 @@ router.put('/:id/reject', async (req, res) => {
   }
 });
 
+// Delete a suspended user
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const deletedUser = await User.findByIdAndDelete(id);
+    if (!deletedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json({ message: 'User deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    res.status(500).json({ message: 'Error deleting user' });
+  }
+});
+
+// Lift suspension
+router.put('/lift-suspension/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { accounts_status: 'Verified' },
+      { new: true } // Return the updated user
+    );
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json({ message: 'User suspension lifted', user: updatedUser });
+  } catch (error) {
+    console.error('Error lifting suspension:', error);
+    res.status(500).json({ message: 'Error lifting suspension' });
+  }
+});
+
+
 module.exports = router;

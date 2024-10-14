@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Modal, Table , Form} from 'react-bootstrap';
+import { Button, Modal, Table, Form } from 'react-bootstrap';
 import axios from 'axios';
-import './styles.css';
+import './pendinghandyman.css';
 
 const PendingHandyman = () => {
   const [showModal, setShowModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false); // New state for delete confirmation modal
   const [selectedHandyman, setSelectedHandyman] = useState(null);
   const [pendingHandymen, setPendingHandymen] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [handymanToDelete, setHandymanToDelete] = useState(null); // Track handyman to delete
 
   // Fetch pending handymen from the backend
   useEffect(() => {
@@ -60,6 +62,26 @@ const PendingHandyman = () => {
     }
   };
 
+  // New function to delete handyman with confirmation
+  const handleDeleteHandyman = (handymanId) => {
+    setHandymanToDelete(handymanId);
+    setShowDeleteModal(true); // Show confirmation modal
+  };
+
+  const confirmDeleteHandyman = () => {
+    if (handymanToDelete) {
+      axios.delete(`http://localhost:5000/api/handymen/${handymanToDelete}`)
+        .then(() => {
+          setPendingHandymen(pendingHandymen.filter(handyman => handyman._id !== handymanToDelete));
+          setShowDeleteModal(false);
+          alert('Handyman deleted successfully!'); // Alert for successful deletion
+        })
+        .catch(error => {
+          console.error('Error deleting handyman:', error);
+        });
+    }
+  };
+
   // Filtering handymen based on the search term
   const filteredHandymen = pendingHandymen.filter((handyman) => {
     const fullName = `${handyman?.fname || ''} ${handyman?.lname || ''}`;
@@ -94,6 +116,9 @@ const PendingHandyman = () => {
                 <Button variant="primary" onClick={() => handleOpenModal(handyman)}>
                   View Details
                 </Button>
+                <Button variant="danger" onClick={() => handleDeleteHandyman(handyman._id)}>
+                  Delete
+                </Button>
               </td>
             </tr>
           ))}
@@ -101,7 +126,7 @@ const PendingHandyman = () => {
       </Table>
 
       {/* Modal for handyman details */}
-      <Modal show={showModal} onHide={handleCloseModal}>
+      <Modal show={showModal} onHide={handleCloseModal} centered>
         <Modal.Header closeButton>
           <Modal.Title>Handyman Details</Modal.Title>
         </Modal.Header>
@@ -112,8 +137,6 @@ const PendingHandyman = () => {
               <p>Description: {selectedHandyman.accounts_status || 'Pending Handyman'}</p>
               <p>Contact: {selectedHandyman.contact}</p>
               <p>Specialization: {selectedHandyman.specialization.join(', ')}</p>
-
-              {/* Conditional rendering for valid ID placeholder */}
               {selectedHandyman.validID ? (
                 <p><strong>Valid ID:</strong> {selectedHandyman.validID}</p>
               ) : (
@@ -126,6 +149,20 @@ const PendingHandyman = () => {
           <Button variant="secondary" onClick={handleCloseModal}>Close</Button>
           <Button variant="success" onClick={handleVerifyHandyman}>Verify</Button>
           <Button variant="danger" onClick={handleRejectHandyman}>Reject</Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Confirmation modal for deletion */}
+      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Deletion</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Are you sure you want to delete this handyman?</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>Cancel</Button>
+          <Button variant="danger" onClick={confirmDeleteHandyman}>Delete</Button>
         </Modal.Footer>
       </Modal>
     </div>

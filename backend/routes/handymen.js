@@ -76,5 +76,28 @@ router.put('/:id/suspend', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+// DELETE /api/handymen/:id
+router.delete('/:id', async (req, res) => {
+  try {
+    const handymanId = req.params.id;
+    await Handyman.findByIdAndDelete(handymanId);
+    res.status(200).json({ message: 'Handyman deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting handyman:', error);
+    res.status(500).json({ message: 'Error deleting handyman' });
+  }
+});
+
+router.put('/lift-suspension/:id', async (req, res) => {
+  try {
+    const handymanId = req.params.id;
+    await Handyman.findByIdAndUpdate(handymanId, { accounts_status: req.body.accounts_status });
+    res.status(200).send({ message: 'Suspension lifted successfully.' });
+  } catch (error) {
+    res.status(500).send({ message: 'Error lifting suspension.' });
+  }
+});
+
+
 
 module.exports = router;

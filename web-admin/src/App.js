@@ -60,7 +60,7 @@ const App = () => {
                                 <Col md={2}>
                                     <AdminSidebar />
                                 </Col>
-                                <Col md={10} className="content-container">
+                                <Col md={10}>
                                     <Routes>
                                         <Route path="/" element={<Navigate to="/dashboard" />} />
                                         <Route path="/dashboard" element={<AdminDashboard />} />

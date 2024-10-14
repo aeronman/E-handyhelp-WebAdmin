@@ -1,0 +1,16 @@
+.table-action-buttons {
+    display: flex; /* Use flexbox to align buttons in a row */
+    justify-content: flex-start; /* Align buttons to the start */
+    gap: 10px; /* Space between buttons */
+  }
+  
+  .table-action-buttons button {
+    white-space: nowrap; /* Prevent text wrapping */
+  }
+  
+  .data-table-cell {
+    overflow: hidden; /* Hide overflow */
+    text-overflow: ellipsis; /* Add ellipsis for overflowing text */
+    white-space: nowrap; /* Prevent text wrapping */
+  }
+  

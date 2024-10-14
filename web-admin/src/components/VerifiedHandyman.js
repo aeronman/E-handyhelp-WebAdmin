@@ -1,22 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Modal, Form } from 'react-bootstrap';
+import { Button, Modal, Form, Alert } from 'react-bootstrap';
 import DataTable from 'react-data-table-component';
-import { FaCheckCircle } from 'react-icons/fa';
 import axios from 'axios';
 import './styles.css';
 
 const VerifiedHandyman = () => {
   const [showModal, setShowModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedHandyman, setSelectedHandyman] = useState(null);
   const [verifiedHandymen, setVerifiedHandymen] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertVisible, setAlertVisible] = useState(false);
 
   // Fetch verified handymen from the backend
   useEffect(() => {
     const fetchVerifiedHandymen = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/handymen/verified'); // Fetching from backend
-        setVerifiedHandymen(response.data); // Set the fetched handymen in state
+        const response = await axios.get('http://localhost:5000/api/handymen/verified');
+        setVerifiedHandymen(response.data);
       } catch (error) {
         console.error('Error fetching verified handymen:', error);
       }
@@ -33,6 +35,31 @@ const VerifiedHandyman = () => {
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedHandyman(null);
+  };
+
+  const handleOpenDeleteModal = (handyman) => {
+    setSelectedHandyman(handyman);
+    setShowDeleteModal(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setShowDeleteModal(false);
+    setSelectedHandyman(null);
+  };
+
+  const handleDeleteHandyman = async () => {
+    if (selectedHandyman) {
+      try {
+        await axios.delete(`http://localhost:5000/api/handymen/${selectedHandyman._id}`);
+        setVerifiedHandymen(verifiedHandymen.filter(handyman => handyman._id !== selectedHandyman._id));
+        setAlertMessage('Handyman deleted successfully!');
+        setAlertVisible(true);
+      } catch (error) {
+        console.error('Error deleting handyman:', error);
+      } finally {
+        handleCloseDeleteModal();
+      }
+    }
   };
 
   // Filter verified handymen based on search term
@@ -54,9 +81,10 @@ const VerifiedHandyman = () => {
     {
       name: 'Action',
       cell: row => (
-        <Button variant="primary" onClick={() => handleOpenModal(row)}>
-          View Details
-        </Button>
+        <>
+          <Button variant="primary" onClick={() => handleOpenModal(row)}>View Details</Button>
+          <Button variant="danger" onClick={() => handleOpenDeleteModal(row)}>Delete</Button>
+        </>
       ),
     },
   ];
@@ -73,7 +101,7 @@ const VerifiedHandyman = () => {
       />
       <DataTable
         columns={columns}
-        data={filteredHandymen} // Use the filtered handymen
+        data={filteredHandymen}
         pagination
         highlightOnHover
         striped
@@ -99,6 +127,25 @@ const VerifiedHandyman = () => {
           <Button variant="secondary" onClick={handleCloseModal}>Close</Button>
         </Modal.Footer>
       </Modal>
+
+      {/* Modal for delete confirmation */}
+      <Modal show={showDeleteModal} onHide={handleCloseDeleteModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Deletion</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete the handyman <strong>{selectedHandyman?.fname} {selectedHandyman?.lname}</strong>?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseDeleteModal}>Cancel</Button>
+          <Button variant="danger" onClick={handleDeleteHandyman}>Delete</Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Alert for successful deletion */}
+      <Alert variant="success" show={alertVisible} onClose={() => setAlertVisible(false)} dismissible>
+        {alertMessage}
+      </Alert>
     </div>
   );
 };

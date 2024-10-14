@@ -17,6 +17,18 @@ router.get('/', async (req, res) => {
     }
 });
 
+// Route to update the report status
+router.put('/:id', async (req, res) => {
+    try {
+        const reportId = req.params.id;
+        const updatedReport = await Report.findByIdAndUpdate(reportId, { status: req.body.status }, { new: true });
+        res.json(updatedReport);
+    } catch (error) {
+        console.error('Error updating report status:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 
 
 module.exports = router;

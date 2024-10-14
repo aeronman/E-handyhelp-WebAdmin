@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Form } from 'react-bootstrap';
 import DataTable from 'react-data-table-component';
-import { FaUserCheck } from 'react-icons/fa';
 import axios from 'axios';
 import './styles.css';
 
@@ -10,6 +9,7 @@ const VerifiedUser = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [verifiedUsers, setVerifiedUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false); // State for delete confirmation
 
   // Fetch verified users from the backend
   useEffect(() => {
@@ -33,6 +33,21 @@ const VerifiedUser = () => {
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedUser(null);
+    setShowDeleteConfirm(false); // Reset delete confirmation when modal closes
+  };
+
+  const handleDeleteUser = async () => {
+    if (selectedUser) {
+      try {
+        await axios.delete(`http://localhost:5000/api/users/${selectedUser._id}`); // Call delete API
+        setVerifiedUsers((prevUsers) =>
+          prevUsers.filter((user) => user._id !== selectedUser._id) // Remove user from state
+        );
+        handleCloseModal();
+      } catch (error) {
+        console.error('Error deleting user:', error);
+      }
+    }
   };
 
   // Filter verified users based on search term
@@ -60,9 +75,17 @@ const VerifiedUser = () => {
     {
       name: 'Action',
       cell: row => (
-        <Button variant="primary" onClick={() => handleOpenModal(row)}>
-          View Details
-        </Button>
+        <div className="button-group">
+          <Button variant="primary" onClick={() => handleOpenModal(row)}>
+            View Details
+          </Button>
+          <Button variant="danger" onClick={() => {
+            setSelectedUser(row);
+            setShowDeleteConfirm(true);
+          }}>
+            Delete
+          </Button>
+        </div>
       ),
     },
   ];
@@ -104,6 +127,20 @@ const VerifiedUser = () => {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModal}>Close</Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Confirmation modal for deletion */}
+      <Modal show={showDeleteConfirm} onHide={handleCloseModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Deletion</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete the user {selectedUser?.fname} {selectedUser?.lname}?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal}>Cancel</Button>
+          <Button variant="danger" onClick={handleDeleteUser}>Delete</Button>
         </Modal.Footer>
       </Modal>
     </div>

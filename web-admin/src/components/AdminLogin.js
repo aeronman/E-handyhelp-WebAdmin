@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import logo from '../assets/ehlogo.png'; 
-import './styles.css'; // Import styles
 
 const AdminLogin = ({ onLogin }) => {
   const [username, setUsername] = useState('');
@@ -18,13 +17,13 @@ const AdminLogin = ({ onLogin }) => {
   };
 
   return (
-    <Container fluid className="admin-login-container">
-      <Row className="justify-content-md-center w-100">
-        <Col md="4" className="admin-login-box">
-          <div className="text-center mb-3 admin-login-logo">
-            <img src={logo} alt="Logo" className="img-fluid" />
+    <Container fluid className="bg-light" style={{ minHeight: '100vh' }}>
+      <Row className="justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
+        <Col xs={12} sm={8} md={6} lg={4} xl={3} className="p-4 shadow rounded bg-white">
+          <div className="text-center mb-3">
+            <img src={logo} alt="Logo" className="img-fluid" style={{ maxWidth: '150px' }} />
           </div>
-          <h3 className="text-center mb-3 admin-login-title">Admin Login</h3>
+          <h3 className="text-center mb-4">Admin Login</h3>
           <Form onSubmit={handleSubmit}>
             <Form.Group controlId="formBasicEmail">
               <Form.Label>Username</Form.Label>
@@ -49,8 +48,7 @@ const AdminLogin = ({ onLogin }) => {
             <Button 
               variant="primary" 
               type="submit" 
-              className="w-100 mt-4" 
-              style={{ backgroundColor: '#001f3f', borderColor: '#001f3f' }}
+              className="w-100 mt-4"
             >
               Login
             </Button>

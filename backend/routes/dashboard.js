@@ -5,8 +5,8 @@ const Handyman = require('../models/Handyman');
 
 router.get('/totals', async (req, res) => {
     try {
-        const handymanTotal = await Handyman.countDocuments();
-        const usersTotal = await User.countDocuments();
+        const handymanTotal = await Handyman.countDocuments({accounts_status:'verified'});
+        const usersTotal = await User.countDocuments({accounts_status:'verified'});
         const pendingHandymenTotal = await Handyman.countDocuments({ accounts_status: 'pending' });
         const pendingUsersTotal = await User.countDocuments({ accounts_status: 'pending' });
         const suspendedHandymenTotal = await Handyman.countDocuments({ accounts_status: 'suspended' });
