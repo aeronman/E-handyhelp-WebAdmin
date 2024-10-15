@@ -79,24 +79,27 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-// Lift suspension
-router.put('/lift-suspension/:id', async (req, res) => {
-  const { id } = req.params;
+// Lift suspension route
+router.put('/:id/lift-suspension', async (req, res) => {
   try {
+    const userId = req.params.id;
+
+    // Find the user by ID and update the accounts_status to 'verified'
     const updatedUser = await User.findByIdAndUpdate(
-      id,
-      { accounts_status: 'Verified' },
-      { new: true } // Return the updated user
+      userId,
+      { accounts_status: 'verified' }, // Update the account status
+      { new: true } // Return the updated document
     );
+
     if (!updatedUser) {
       return res.status(404).json({ message: 'User not found' });
     }
-    res.json({ message: 'User suspension lifted', user: updatedUser });
+
+    res.json({ message: 'Suspension lifted successfully', user: updatedUser });
   } catch (error) {
     console.error('Error lifting suspension:', error);
-    res.status(500).json({ message: 'Error lifting suspension' });
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
-
 
 module.exports = router;

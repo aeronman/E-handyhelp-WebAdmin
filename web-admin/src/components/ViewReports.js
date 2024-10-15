@@ -57,46 +57,45 @@ const ViewReports = () => {
 
     return (
         <div className="view-reports-container">
-        <h2 className="view-reports-title">Pending Reports</h2>
-        <div className="reports-list">
-            {reports.map((report, index) => (
-                <Card key={index} className="report-card">
-                    <Card.Body>
-                        <Card.Title>{report.reportReason}</Card.Title>
-                        <Card.Text>
-                            <strong>Reported By:</strong> {report.userId.fname} {report.userId.lname}<br />
-                            <strong>Handyman:</strong> {report.handymanId.fname} {report.handymanId.lname}
-                        </Card.Text>
-                        <Button variant="primary" onClick={() => handleShowModal(report)}>
-                            View Details
+            <h2 className="view-reports-title">Pending Reports</h2>
+            <div className="reports-list">
+                {reports.map((report, index) => (
+                    <Card key={index} className="report-card">
+                        <Card.Body>
+                            <Card.Title>{report?.reportReason || 'No Reason Provided'}</Card.Title>
+                            <Card.Text>
+                                <strong>Reported By:</strong> {report?.userId?.fname || 'N/A'} {report?.userId?.lname || ''}<br />
+                                <strong>Handyman:</strong> {report?.handymanId?.fname || 'N/A'} {report?.handymanId?.lname || ''}
+                            </Card.Text>
+                            <Button variant="primary" onClick={() => handleShowModal(report)}>
+                                View Details
+                            </Button>
+                            <Button variant="danger" onClick={() => handleSuspendHandyman(report?.handymanId?._id, report?._id)}>
+                                Suspend Handyman
+                            </Button>
+                        </Card.Body>
+                    </Card>
+                ))}
+            </div>
+
+            {selectedReport && (
+                <Modal show={showModal} onHide={handleCloseModal} size="lg"> {/* Optional: Add size prop for larger modal */}
+                    <Modal.Header closeButton>
+                        <Modal.Title>{selectedReport?.reportReason || 'No Reason Provided'}</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <p><strong>Description:</strong> {selectedReport?.additionalInfo?.workDescription || 'N/A'}</p>
+                        <p><strong>Reported By:</strong> {selectedReport?.userId?.fname || 'N/A'} {selectedReport?.userId?.lname || ''}</p>
+                        <p><strong>Date Reported:</strong> {new Date(selectedReport?.additionalInfo?.dateReported).toLocaleString() || 'N/A'}</p>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={handleCloseModal}>
+                            Close
                         </Button>
-                        <Button variant="danger" onClick={() => handleSuspendHandyman(report.handymanId._id, report._id)}>
-                            Suspend Handyman
-                        </Button>
-                    </Card.Body>
-                </Card>
-            ))}
+                    </Modal.Footer>
+                </Modal>
+            )}
         </div>
-    
-        {selectedReport && (
-            <Modal show={showModal} onHide={handleCloseModal} size="lg"> {/* Optional: Add size prop for larger modal */}
-                <Modal.Header closeButton>
-                    <Modal.Title>{selectedReport.reportReason}</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <p><strong>Description:</strong> {selectedReport.additionalInfo.workDescription}</p>
-                    <p><strong>Reported By:</strong> {selectedReport.userId.fname} {selectedReport.userId.lname}</p>
-                    <p><strong>Date Reported:</strong> {new Date(selectedReport.additionalInfo.dateReported).toLocaleString()}</p>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleCloseModal}>
-                        Close
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-        )}
-    </div>
-    
     );
 };
 

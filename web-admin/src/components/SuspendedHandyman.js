@@ -14,17 +14,17 @@ const SuspendedHandyman = () => {
   const [alert, setAlert] = useState(null);
 
   // Fetch suspended handymen from the backend
-  useEffect(() => {
-    const fetchSuspendedHandymen = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/api/handymen/suspended');
-        setSuspendedHandymen(response.data);
-      } catch (error) {
-        console.error('Error fetching suspended handymen:', error);
-      }
-    };
+  const fetchSuspendedHandymen = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/handymen/suspended');
+      setSuspendedHandymen(response.data);
+    } catch (error) {
+      console.error('Error fetching suspended handymen:', error);
+    }
+  };
 
-    fetchSuspendedHandymen();
+  useEffect(() => {
+    fetchSuspendedHandymen();  // Fetch data when component mounts
   }, []);
 
   const handleOpenModal = (handyman) => {
@@ -47,9 +47,9 @@ const SuspendedHandyman = () => {
 
   const handleDeleteHandyman = async () => {
     try {
-      await axios.delete(`http://localhost:5000/api/handymen/${selectedHandyman.id}`);
-      setSuspendedHandymen(suspendedHandymen.filter(h => h.id !== selectedHandyman.id));
+      await axios.delete(`http://localhost:5000/api/handymen/${selectedHandyman._id}`);
       setAlert({ type: 'success', message: 'Handyman deleted successfully.' });
+      await fetchSuspendedHandymen();  // Refresh data after deletion
     } catch (error) {
       console.error('Error deleting handyman:', error);
       setAlert({ type: 'danger', message: 'Failed to delete handyman.' });
@@ -61,13 +61,11 @@ const SuspendedHandyman = () => {
 
   const handleLiftSuspension = async () => {
     try {
-      await axios.put(`http://localhost:5000/api/handymen/lift-suspension/${selectedHandyman.id}`, {
+      await axios.put(`http://localhost:5000/api/handymen/lift-suspension/${selectedHandyman._id}`, {
         accounts_status: 'verified',
       });
-      setSuspendedHandymen(suspendedHandymen.map(h => 
-        h.id === selectedHandyman.id ? { ...h, accounts_status: 'verified' } : h
-      ));
       setAlert({ type: 'success', message: 'Suspension lifted successfully.' });
+      await fetchSuspendedHandymen();  // Refresh data after lifting suspension
     } catch (error) {
       console.error('Error lifting suspension:', error);
       setAlert({ type: 'danger', message: 'Failed to lift suspension.' });
@@ -87,19 +85,19 @@ const SuspendedHandyman = () => {
       name: 'Name',
       selector: row => `${row.fname} ${row.lname}`,
       sortable: true,
-      width: '150px', // Adjust width as needed
+      width: '150px',
     },
     {
       name: 'Email',
       selector: row => row.email,
       sortable: true,
-      width: '200px', // Adjust width as needed
+      width: '200px',
     },
     {
       name: 'Account Status',
       selector: row => row.accounts_status || 'Suspended',
       sortable: true,
-      width: '150px', // Adjust width as needed
+      width: '150px',
     },
     {
       name: 'Actions',
@@ -116,7 +114,7 @@ const SuspendedHandyman = () => {
           </Button>
         </div>
       ),
-      width: '200px', // Adjust width to allow buttons to fit
+      width: '200px',
     },
   ];
   
@@ -139,7 +137,6 @@ const SuspendedHandyman = () => {
         responsive
       />
 
-      {/* Alert for success or error messages */}
       {alert && (
         <Alert variant={alert.type} onClose={() => setAlert(null)} dismissible>
           {alert.message}

@@ -12,17 +12,18 @@ const SuspendedUser = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [alert, setAlert] = useState(null);
 
-  // Fetch suspended users from the backend
-  useEffect(() => {
-    const fetchSuspendedUsers = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/api/users/suspended');
-        setSuspendedUsers(response.data);
-      } catch (error) {
-        console.error('Error fetching suspended users:', error);
-      }
-    };
+  // Function to fetch suspended users from the backend
+  const fetchSuspendedUsers = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/users/suspended');
+      setSuspendedUsers(response.data);
+    } catch (error) {
+      console.error('Error fetching suspended users:', error);
+    }
+  };
 
+  // Fetch suspended users when component mounts
+  useEffect(() => {
     fetchSuspendedUsers();
   }, []);
 
@@ -42,15 +43,26 @@ const SuspendedUser = () => {
 
   const handleDeleteUser = async () => {
     try {
-      await axios.delete(`http://localhost:5000/api/users/${selectedUser.id}`);
-      setSuspendedUsers(suspendedUsers.filter(user => user.id !== selectedUser.id));
+      await axios.delete(`http://localhost:5000/api/users/${selectedUser._id}`);
       setAlert({ type: 'success', message: 'User deleted successfully.' });
+      fetchSuspendedUsers(); // Refresh the list after deletion
     } catch (error) {
       console.error('Error deleting user:', error);
       setAlert({ type: 'danger', message: 'Failed to delete user.' });
     } finally {
       setShowConfirmDelete(false);
       setSelectedUser(null);
+    }
+  };
+
+  const handleLiftSuspension = async (user) => {
+    try {
+      await axios.put(`http://localhost:5000/api/users/${user._id}/lift-suspension`);
+      setAlert({ type: 'success', message: `Suspension lifted for ${user.fname} ${user.lname}.` });
+      fetchSuspendedUsers(); // Refresh the list after lifting suspension
+    } catch (error) {
+      console.error('Error lifting suspension:', error);
+      setAlert({ type: 'danger', message: 'Failed to lift suspension.' });
     }
   };
 
@@ -86,7 +98,7 @@ const SuspendedUser = () => {
           <Button variant="danger" onClick={() => { setSelectedUser(row); handleConfirmDelete(); }} className="btn">
             Delete
           </Button>
-          <Button variant="success" onClick={() => { /* Implement logic to lift suspension here */ }} className="btn">
+          <Button variant="success" onClick={() => handleLiftSuspension(row)} className="btn">
             Lift Suspension
           </Button>
         </div>

@@ -145,33 +145,64 @@ body {
     background-color: #f0f0f0; /* Slightly darker shade */
 }
 
-/* Dropdown styles */
-.dropdown-content {
-    display: none;
-    background-color: #ffffff; /* Changed to white */
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    position: absolute;
-    min-width: 200px;
-    z-index: 1;
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  padding: 10px;
 }
 
-.dropdown-content a {
-    color: #333; /* Dark text color */
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
+.sidebar-logo {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
 }
 
-.dropdown-content a:hover {
-    background-color: #f0f0f0; /* Slightly darker shade */
+.sidebar-title {
+  font-size: 14px;
+  color: #333;
 }
 
-.dropdown:hover .dropdown-content {
-    display: block;
+ul {
+  list-style-type: none;
+  padding: 0;
 }
 
-.dropdown {
-    position: relative;
+li {
+  position: relative;
+}
+
+.collapsible {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+  color: #333;
+  text-decoration: none;
+}
+
+.collapsible:hover {
+  background-color: #ddd; /* Highlight on hover */
+}
+
+.icon {
+  margin-left: 10px;
+}
+
+.collapsible-content {
+  padding-left: 20px; /* Indentation */
+  background-color: #e9ecef; /* Background for collapsible content */
+}
+
+.collapsible-content a {
+  padding: 8px;
+  color: #555;
+  text-decoration: none;
+  display: block;
+}
+
+.collapsible-content a:hover {
+  background-color: #ccc;
 }
 
 /* Admin Dashboard styles */
@@ -455,7 +486,7 @@ body {
   }
   
   .icon {
-    font-size: 4rem;
+    font-size: 1.5rem;
     color: #007bff;
     margin-bottom: 10px;
   }
@@ -584,8 +615,9 @@ body {
   }
   
   .icon {
-    font-size: 4rem;
+    font-size: 1.5rem;
     color: #007bff;
     margin-bottom: 10px;
   }
+  
   

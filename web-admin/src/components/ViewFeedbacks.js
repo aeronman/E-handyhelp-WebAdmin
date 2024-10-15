@@ -58,8 +58,9 @@ const ViewFeedbacks = () => {
                         <Card.Body>
                             <Card.Title>Feedback for Handyman</Card.Title>
                             <Card.Text>
-                                <strong>Feedback By:</strong> {feedback.userId.fname} {feedback.userId.lname} <br />
-                                <strong>Handyman:</strong> {feedback.handymanId.fname} {feedback.handymanId.lname} <br />
+                                {/* Use optional chaining to avoid errors */}
+                                <strong>Feedback By:</strong> {feedback.userId?.fname || 'N/A'} {feedback.userId?.lname || 'N/A'} <br />
+                                <strong>Handyman:</strong> {feedback.handymanId?.fname || 'N/A'} {feedback.handymanId?.lname || 'N/A'} <br />
                                 <strong>Rating:</strong> {renderStars(feedback.rating)} {/* Display star icons */}
                             </Card.Text>
                             <Button variant="primary" onClick={() => handleShowModal(feedback)}>
@@ -77,8 +78,8 @@ const ViewFeedbacks = () => {
                     </Modal.Header>
                     <Modal.Body>
                         <p><strong>Feedback Text:</strong> {selectedFeedback.feedbackText}</p>
-                        <p><strong>Feedback By:</strong> {selectedFeedback.userId.fname} {selectedFeedback.userId.lname}</p>
-                        <p><strong>Handyman:</strong> {selectedFeedback.handymanId.fname} {selectedFeedback.handymanId.lname}</p>
+                        <p><strong>Feedback By:</strong> {selectedFeedback.userId?.fname || 'N/A'} {selectedFeedback.userId?.lname || 'N/A'}</p>
+                        <p><strong>Handyman:</strong> {selectedFeedback.handymanId?.fname || 'N/A'} {selectedFeedback.handymanId?.lname || 'N/A'}</p>
                         <p><strong>Rating:</strong> {renderStars(selectedFeedback.rating)}</p>
                         <p><strong>Date Submitted:</strong> {new Date(selectedFeedback.timestamp).toLocaleString()}</p>
                         
