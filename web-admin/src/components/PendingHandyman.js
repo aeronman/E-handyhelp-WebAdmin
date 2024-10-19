@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Modal, Table, Form } from 'react-bootstrap';
+import { Button, Modal, Form } from 'react-bootstrap';
+import DataTable from 'react-data-table-component';
 import axios from 'axios';
 import './pendinghandyman.css';
 
 const PendingHandyman = () => {
   const [showModal, setShowModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false); // New state for delete confirmation modal
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedHandyman, setSelectedHandyman] = useState(null);
   const [pendingHandymen, setPendingHandymen] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [handymanToDelete, setHandymanToDelete] = useState(null); // Track handyman to delete
+  const [handymanToDelete, setHandymanToDelete] = useState(null);
 
   // Fetch pending handymen from the backend
   useEffect(() => {
-    axios.get('http://localhost:5000/api/handymen/pending') // Fetching from backend
+    axios.get('http://localhost:5000/api/handymen/pending')
       .then((response) => {
-        setPendingHandymen(response.data); // Set the fetched handymen in state
+        setPendingHandymen(response.data);
       })
       .catch((error) => {
         console.error('Error fetching handymen:', error);
@@ -62,10 +63,9 @@ const PendingHandyman = () => {
     }
   };
 
-  // New function to delete handyman with confirmation
   const handleDeleteHandyman = (handymanId) => {
     setHandymanToDelete(handymanId);
-    setShowDeleteModal(true); // Show confirmation modal
+    setShowDeleteModal(true);
   };
 
   const confirmDeleteHandyman = () => {
@@ -74,7 +74,7 @@ const PendingHandyman = () => {
         .then(() => {
           setPendingHandymen(pendingHandymen.filter(handyman => handyman._id !== handymanToDelete));
           setShowDeleteModal(false);
-          alert('Handyman deleted successfully!'); // Alert for successful deletion
+          alert('Handyman deleted successfully!');
         })
         .catch(error => {
           console.error('Error deleting handyman:', error);
@@ -89,6 +89,32 @@ const PendingHandyman = () => {
            (handyman?.contact && handyman.contact.toLowerCase().includes(searchTerm.toLowerCase()));
   });
 
+  const columns = [
+    {
+      name: 'Name',
+      selector: row => `${row.fname} ${row.lname}`,
+      sortable: true,
+    },
+    {
+      name: 'Status',
+      selector: row => row.accounts_status || 'Pending Handyman',
+      sortable: true,
+    },
+    {
+      name: 'Action',
+      cell: row => (
+        <>
+          <Button variant="primary" onClick={() => handleOpenModal(row)}>
+            View Details
+          </Button>
+          <Button variant="danger" onClick={() => handleDeleteHandyman(row._id)} className="ml-2">
+            Delete
+          </Button>
+        </>
+      ),
+    },
+  ];
+
   return (
     <div className="content-container pending-handyman">
       <h2>Pending Handymen</h2>
@@ -99,31 +125,14 @@ const PendingHandyman = () => {
         onChange={(e) => setSearchTerm(e.target.value)}
         className="mb-3"
       />
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredHandymen.map((handyman) => (
-            <tr key={handyman._id}>
-              <td>{handyman.fname} {handyman.lname}</td>
-              <td>{handyman.accounts_status || 'Pending Handyman'}</td>
-              <td>
-                <Button variant="primary" onClick={() => handleOpenModal(handyman)}>
-                  View Details
-                </Button>
-                <Button variant="danger" onClick={() => handleDeleteHandyman(handyman._id)}>
-                  Delete
-                </Button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+      <DataTable
+        columns={columns}
+        data={filteredHandymen}
+        pagination
+        highlightOnHover
+        responsive
+        style={{ minHeight: '400px' }} // Adjust as needed for your layout
+      />
 
       {/* Modal for handyman details */}
       <Modal show={showModal} onHide={handleCloseModal} centered>

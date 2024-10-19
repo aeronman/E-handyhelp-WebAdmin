@@ -83,14 +83,14 @@ const VerifiedHandyman = () => {
       cell: row => (
         <>
           <Button variant="primary" onClick={() => handleOpenModal(row)}>View Details</Button>
-          <Button variant="danger" onClick={() => handleOpenDeleteModal(row)}>Delete</Button>
+          <Button variant="danger" onClick={() => handleOpenDeleteModal(row)} className="ml-2">Delete</Button>
         </>
       ),
     },
   ];
 
   return (
-    <div className="content-container verified-handyman">
+    <div className="content-container verified-handyman" style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
       <h2>Verified Handymen</h2>
       <Form.Control
         type="text"
@@ -99,14 +99,17 @@ const VerifiedHandyman = () => {
         onChange={(e) => setSearchTerm(e.target.value)}
         className="mb-3"
       />
-      <DataTable
-        columns={columns}
-        data={filteredHandymen}
-        pagination
-        highlightOnHover
-        striped
-        responsive
-      />
+      <div style={{ flex: 1, overflow: 'auto' }}>
+        <DataTable
+          columns={columns}
+          data={filteredHandymen}
+          pagination
+          highlightOnHover
+          striped
+          responsive
+          style={{ minHeight: '400px' }} // Ensure a minimum height for the DataTable
+        />
+      </div>
 
       {/* Modal for handyman details */}
       <Modal show={showModal} onHide={handleCloseModal}>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Button, Modal } from 'react-bootstrap';
+import { Button, Modal } from 'react-bootstrap';
 import axios from 'axios';
+import DataTable from 'react-data-table-component';
 import './reportstyles.css';
 
 const ViewReports = () => {
@@ -15,7 +16,6 @@ const ViewReports = () => {
     const fetchReports = async () => {
         try {
             const response = await axios.get('http://localhost:5000/api/reports');
-            // Filter reports to only include those with status 'pending'
             const pendingReports = response.data.filter(report => report.status === 'pending');
             setReports(pendingReports);
         } catch (error) {
@@ -35,19 +35,8 @@ const ViewReports = () => {
 
     const handleSuspendHandyman = async (handymanId, reportId) => {
         try {
-            // Suspend the handyman
-            const response = await fetch(`http://localhost:5000/api/handymen/${handymanId}/suspend`, {
-                method: 'PUT',
-            });
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-
-            // Update the report status to completed
-            await axios.put(`http://localhost:5000/api/reports/${reportId}`, {
-                status: 'completed',
-            });
-
+            await fetch(`http://localhost:5000/api/handymen/${handymanId}/suspend`, { method: 'PUT' });
+            await axios.put(`http://localhost:5000/api/reports/${reportId}`, { status: 'completed' });
             alert('Handyman suspended successfully and report status updated to completed.');
             fetchReports(); // Refresh the reports
         } catch (error) {
@@ -55,31 +44,91 @@ const ViewReports = () => {
         }
     };
 
+    const handleSuspendUser = async (userId, reportId) => {
+        try {
+            await fetch(`http://localhost:5000/api/users/${userId}/suspend`, { method: 'PUT' });
+            await axios.put(`http://localhost:5000/api/reports/${reportId}`, { status: 'completed' });
+            alert('User suspended successfully and report status updated to completed.');
+            fetchReports(); // Refresh the reports
+        } catch (error) {
+            console.error('Error suspending user:', error);
+        }
+    };
+
+    const handleSendWarning = async (report) => {
+        const notificationContent = "Your account is subjected for suspension. Please email us your NTE to avoid account suspension.";
+        const notification = {
+            handymanId: report.handymanId?._id,
+            userId: report.userId?._id,
+            notification_content: notificationContent,
+            notif_for: report.reported_by === 'handyman' ? 'handyman' : 'user',
+            date_sent: new Date().toISOString(),
+        };
+
+        try {
+            await axios.post('http://localhost:5000/api/notifications', notification);
+            alert('Warning sent successfully.');
+        } catch (error) {
+            console.error('Error sending warning:', error);
+        }
+    };
+
+    const columns = [
+        {
+            name: 'Report Reason',
+            selector: 'reportReason',
+            cell: row => row.reportReason || 'No Reason Provided',
+        },
+        {
+            name: 'Reported By',
+            selector: 'reportedBy',
+            cell: row => row.reported_by === 'handyman'
+                ? `${row.handymanId.fname || 'N/A'} ${row.handymanId.lname || ''}`
+                : `${row.userId.fname || 'N/A'} ${row.userId.lname || ''}`,
+        },
+        {
+            name: 'Date Reported',
+            selector: 'dateReported',
+            cell: row => new Date(row.additionalInfo.dateReported).toLocaleString() || 'N/A',
+        },
+        {
+            name: 'Actions',
+            cell: row => (
+                <>
+                    <Button variant="primary" onClick={() => handleShowModal(row)}>View Details</Button>
+                    {row.reported_by === 'handyman' ? (
+                        <>
+                            <Button variant="danger" onClick={() => handleSuspendHandyman(row.handymanId._id, row._id)}>Suspend Handyman</Button>
+                            <Button variant="warning" onClick={() => handleSendWarning(row)}>Send Warning</Button>
+                        </>
+                    ) : (
+                        <>
+                            <Button variant="danger" onClick={() => handleSuspendUser(row.userId._id, row._id)}>Suspend User</Button>
+                            <Button variant="warning" onClick={() => handleSendWarning(row)}>Send Warning</Button>
+                        </>
+                    )}
+                </>
+            ),
+        },
+    ];
+
     return (
-        <div className="view-reports-container">
+        <div className="view-reports-container text-center">
             <h2 className="view-reports-title">Pending Reports</h2>
-            <div className="reports-list">
-                {reports.map((report, index) => (
-                    <Card key={index} className="report-card">
-                        <Card.Body>
-                            <Card.Title>{report?.reportReason || 'No Reason Provided'}</Card.Title>
-                            <Card.Text>
-                                <strong>Reported By:</strong> {report?.userId?.fname || 'N/A'} {report?.userId?.lname || ''}<br />
-                                <strong>Handyman:</strong> {report?.handymanId?.fname || 'N/A'} {report?.handymanId?.lname || ''}
-                            </Card.Text>
-                            <Button variant="primary" onClick={() => handleShowModal(report)}>
-                                View Details
-                            </Button>
-                            <Button variant="danger" onClick={() => handleSuspendHandyman(report?.handymanId?._id, report?._id)}>
-                                Suspend Handyman
-                            </Button>
-                        </Card.Body>
-                    </Card>
-                ))}
+            <div className="table-responsive">
+                <DataTable
+                    columns={columns}
+                    data={reports}
+                    pagination
+                    highlightOnHover
+                    customStyles={{
+                        table: { margin: '0 auto' }, // Center the table
+                    }}
+                />
             </div>
 
             {selectedReport && (
-                <Modal show={showModal} onHide={handleCloseModal} size="lg"> {/* Optional: Add size prop for larger modal */}
+                <Modal show={showModal} onHide={handleCloseModal} size="lg">
                     <Modal.Header closeButton>
                         <Modal.Title>{selectedReport?.reportReason || 'No Reason Provided'}</Modal.Title>
                     </Modal.Header>
@@ -89,9 +138,7 @@ const ViewReports = () => {
                         <p><strong>Date Reported:</strong> {new Date(selectedReport?.additionalInfo?.dateReported).toLocaleString() || 'N/A'}</p>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button variant="secondary" onClick={handleCloseModal}>
-                            Close
-                        </Button>
+                        <Button variant="secondary" onClick={handleCloseModal}>Close</Button>
                     </Modal.Footer>
                 </Modal>
             )}
