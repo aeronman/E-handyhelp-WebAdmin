@@ -46,9 +46,11 @@ const PendingUser = () => {
             user._id === selectedUser._id ? { ...user, account_status: 'verified' } : user
           )
         );
+        setAlert({ type: 'success', message: 'User verified successfully.' }); // Alert on success
         handleCloseModal();
       } catch (error) {
         console.error('Error verifying user:', error);
+        setAlert({ type: 'danger', message: 'Failed to verify user.' }); // Alert on error
       }
     }
   };
@@ -62,9 +64,11 @@ const PendingUser = () => {
             user._id === selectedUser._id ? { ...user, account_status: 'rejected' } : user
           )
         );
+        setAlert({ type: 'success', message: 'User rejected successfully.' }); // Alert on success
         handleCloseModal();
       } catch (error) {
         console.error('Error rejecting user:', error);
+        setAlert({ type: 'danger', message: 'Failed to reject user.' }); // Alert on error
       }
     }
   };
@@ -92,13 +96,13 @@ const PendingUser = () => {
       sortable: true,
     },
     {
-      name: 'Email',
-      selector: (row) => row.email,
+      name: 'Username',
+      selector: (row) => row.username,
       sortable: true,
     },
     {
       name: 'Account Status',
-      selector: (row) => row.account_status,
+      selector: (row) => row.account_status, // Fixed typo here
       sortable: true,
     },
     {
@@ -119,7 +123,7 @@ const PendingUser = () => {
   const filteredUsers = pendingUsers.filter((user) => {
     const fullName = `${user?.fname || ''} ${user?.lname || ''}`;
     return fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-           (user?.email && user.email.toLowerCase().includes(searchTerm.toLowerCase()));
+           (user?.username && user.username.toLowerCase().includes(searchTerm.toLowerCase()));
   });
 
   return (

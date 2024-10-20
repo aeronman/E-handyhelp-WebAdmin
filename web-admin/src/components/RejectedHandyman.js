@@ -59,6 +59,7 @@ const RejectedHandyman = () => {
   const filteredHandymen = rejectedHandymen.filter(handyman =>
     `${handyman.fname} ${handyman.lname}`.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
   const columns = [
     {
       name: 'Name',
@@ -66,8 +67,8 @@ const RejectedHandyman = () => {
       sortable: true,
     },
     {
-      name: 'Email',
-      selector: row => row.email,
+      name: 'Username',
+      selector: row => row.username,
       sortable: true,
     },
     {
@@ -78,8 +79,8 @@ const RejectedHandyman = () => {
     {
       name: 'Action',
       cell: row => (
-        <div className="table-action-buttons">
-          <Button variant="primary" onClick={() => handleOpenModal(row)}>
+        <div className="table-action- ">
+          <Button variant="primary" onClick={() => handleOpenModal(row)} className="mr-2">
             View Details
           </Button>
           <Button variant="danger" onClick={() => handleOpenDeleteModal(row)}>
@@ -89,7 +90,6 @@ const RejectedHandyman = () => {
       ),
     },
   ];
-  
 
   return (
     <div className="content-container rejected-handyman">
@@ -101,7 +101,7 @@ const RejectedHandyman = () => {
         onChange={(e) => setSearchTerm(e.target.value)}
         className="mb-3"
       />
-      <div style={{ overflowX: 'auto' }}> {/* Make the DataTable responsive */}
+      <div> {/* Removed overflow styling for better layout */ }
         <DataTable
           columns={columns}
           data={filteredHandymen} // Use filtered data for display
@@ -109,10 +109,9 @@ const RejectedHandyman = () => {
           highlightOnHover
           striped
           responsive
-          searchable
         />
       </div>
-  
+
       {/* Modal for handyman details */}
       <Modal show={showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
@@ -124,7 +123,7 @@ const RejectedHandyman = () => {
               <h5>
                 Name: {selectedHandyman.fname} {selectedHandyman.lname}
               </h5>
-              <p>Email: {selectedHandyman.email}</p>
+              <p>Username: {selectedHandyman.username}</p>
               <p>Contact: {selectedHandyman.contact}</p>
               <p>Specialization: {selectedHandyman.specialization.join(', ')}</p>
               <p>Account Status: {selectedHandyman.accounts_status}</p>
@@ -137,7 +136,7 @@ const RejectedHandyman = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-  
+
       {/* Delete Confirmation Modal */}
       <Modal show={showDeleteModal} onHide={handleCloseDeleteModal}>
         <Modal.Header closeButton>
@@ -157,7 +156,6 @@ const RejectedHandyman = () => {
       </Modal>
     </div>
   );
-  
 };
 
 export default RejectedHandyman;

@@ -57,10 +57,10 @@ const App = () => {
                         <Navbar onLogout={handleLogout} />
                         <Container fluid className="main-content">
                             <Row>
-                                <Col md={2}>
+                                <Col md={3}>
                                     <AdminSidebar />
                                 </Col>
-                                <Col md={10}>
+                                <Col md={9}>
                                     <Routes>
                                         <Route path="/" element={<Navigate to="/dashboard" />} />
                                         <Route path="/dashboard" element={<AdminDashboard />} />

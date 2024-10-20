@@ -62,8 +62,8 @@ const RejectedUser = () => {
       sortable: true,
     },
     {
-      name: 'Email',
-      selector: row => row.email,
+      name: 'Username',
+      selector: row => row.username,
       sortable: true,
     },
     {
@@ -117,7 +117,7 @@ const RejectedUser = () => {
           {selectedUser && (
             <>
               <h5>Name: {selectedUser.fname} {selectedUser.lname}</h5>
-              <p>Email: {selectedUser.email}</p>
+              <p>Username: {selectedUser.username}</p>
               <p>Contact: {selectedUser.contact}</p>
               <p>Date of Birth: {new Date(selectedUser.dateOfBirth).toLocaleDateString()}</p>
               <p>Account Status: {selectedUser.accounts_status}</p>

@@ -53,7 +53,7 @@ const VerifiedUser = () => {
   // Filter verified users based on search term
   const filteredUsers = verifiedUsers.filter(user =>
     `${user.fname} ${user.lname}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+    user.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const columns = [
@@ -63,8 +63,8 @@ const VerifiedUser = () => {
       sortable: true,
     },
     {
-      name: 'Email',
-      selector: row => row.email,
+      name: 'Username',
+      selector: row => row.username,
       sortable: true,
     },
     {
@@ -95,7 +95,7 @@ const VerifiedUser = () => {
       <h2>Verified Users</h2>
       <Form.Control
         type="text"
-        placeholder="Search by name or email..."
+        placeholder="Search by name or username..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         className="mb-3"
@@ -118,7 +118,7 @@ const VerifiedUser = () => {
           {selectedUser && (
             <>
               <h5>Name: {selectedUser.fname} {selectedUser.lname}</h5>
-              <p>Email: {selectedUser.email}</p>
+              <p>Username: {selectedUser.username}</p>
               <p>Contact: {selectedUser.contact}</p>
               <p>Date of Birth: {new Date(selectedUser.dateOfBirth).toLocaleDateString()}</p>
               <p>Account Status: {selectedUser.accounts_status}</p>

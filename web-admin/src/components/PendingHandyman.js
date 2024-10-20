@@ -103,14 +103,14 @@ const PendingHandyman = () => {
     {
       name: 'Action',
       cell: row => (
-        <>
-          <Button variant="primary" onClick={() => handleOpenModal(row)}>
+        <div className="action-buttons">
+          <Button variant="primary" onClick={() => handleOpenModal(row)} className="mb-2">
             View Details
           </Button>
-          <Button variant="danger" onClick={() => handleDeleteHandyman(row._id)} className="ml-2">
+          <Button variant="danger" onClick={() => handleDeleteHandyman(row._id)}>
             Delete
           </Button>
-        </>
+        </div>
       ),
     },
   ];
@@ -131,7 +131,13 @@ const PendingHandyman = () => {
         pagination
         highlightOnHover
         responsive
-        style={{ minHeight: '400px' }} // Adjust as needed for your layout
+        customStyles={{
+          table: {
+            style: {
+              width: '100%',
+            },
+          },
+        }}
       />
 
       {/* Modal for handyman details */}

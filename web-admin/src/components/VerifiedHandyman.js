@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button, Modal, Form, Alert } from 'react-bootstrap';
 import DataTable from 'react-data-table-component';
 import axios from 'axios';
-import './styles.css';
+import './verifiedhandyman.css';
 
 const VerifiedHandyman = () => {
   const [showModal, setShowModal] = useState(false);
@@ -15,16 +15,13 @@ const VerifiedHandyman = () => {
 
   // Fetch verified handymen from the backend
   useEffect(() => {
-    const fetchVerifiedHandymen = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/api/handymen/verified');
+    axios.get('http://localhost:5000/api/handymen/verified')
+      .then((response) => {
         setVerifiedHandymen(response.data);
-      } catch (error) {
+      })
+      .catch((error) => {
         console.error('Error fetching verified handymen:', error);
-      }
-    };
-
-    fetchVerifiedHandymen();
+      });
   }, []);
 
   const handleOpenModal = (handyman) => {
@@ -82,37 +79,39 @@ const VerifiedHandyman = () => {
       name: 'Action',
       cell: row => (
         <>
-          <Button variant="primary" onClick={() => handleOpenModal(row)}>View Details</Button>
-          <Button variant="danger" onClick={() => handleOpenDeleteModal(row)} className="ml-2">Delete</Button>
+          <Button variant="primary" onClick={() => handleOpenModal(row)}>
+            View Details
+          </Button>
+          <Button variant="danger" onClick={() => handleOpenDeleteModal(row)} className="ml-2">
+            Delete
+          </Button>
         </>
       ),
     },
   ];
 
   return (
-    <div className="content-container verified-handyman" style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div className="content-container verified-handyman">
       <h2>Verified Handymen</h2>
       <Form.Control
         type="text"
-        placeholder="Search by name..."
+        placeholder="Search by Name or Contact"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         className="mb-3"
       />
-      <div style={{ flex: 1, overflow: 'auto' }}>
-        <DataTable
-          columns={columns}
-          data={filteredHandymen}
-          pagination
-          highlightOnHover
-          striped
-          responsive
-          style={{ minHeight: '400px' }} // Ensure a minimum height for the DataTable
-        />
-      </div>
+      <DataTable
+        columns={columns}
+        data={filteredHandymen}
+        pagination
+        highlightOnHover
+        striped
+        responsive
+        style={{ minHeight: '400px' }} // Consistent with other component layout
+      />
 
       {/* Modal for handyman details */}
-      <Modal show={showModal} onHide={handleCloseModal}>
+      <Modal show={showModal} onHide={handleCloseModal} centered>
         <Modal.Header closeButton>
           <Modal.Title>Handyman Details</Modal.Title>
         </Modal.Header>
@@ -132,7 +131,7 @@ const VerifiedHandyman = () => {
       </Modal>
 
       {/* Modal for delete confirmation */}
-      <Modal show={showDeleteModal} onHide={handleCloseDeleteModal}>
+      <Modal show={showDeleteModal} onHide={handleCloseDeleteModal} centered>
         <Modal.Header closeButton>
           <Modal.Title>Confirm Deletion</Modal.Title>
         </Modal.Header>

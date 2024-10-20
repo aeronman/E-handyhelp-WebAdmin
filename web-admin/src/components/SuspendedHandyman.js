@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button, Modal, Form, Alert } from 'react-bootstrap';
 import DataTable from 'react-data-table-component';
 import axios from 'axios';
-import './styles.css';
+import './suspendedhandyman.css'
 
 const SuspendedHandyman = () => {
   const [showModal, setShowModal] = useState(false);
@@ -88,8 +88,8 @@ const SuspendedHandyman = () => {
       width: '150px',
     },
     {
-      name: 'Email',
-      selector: row => row.email,
+      name: 'Username',
+      selector: row => row.username, // Replaced email with username
       sortable: true,
       width: '200px',
     },
@@ -152,7 +152,7 @@ const SuspendedHandyman = () => {
           {selectedHandyman && (
             <>
               <h5>Name: {selectedHandyman.fname} {selectedHandyman.lname}</h5>
-              <p>Email: {selectedHandyman.email}</p>
+              <p>Username: {selectedHandyman.username}</p> {/* Updated to display username */}
               <p>Contact: {selectedHandyman.contact}</p>
               <p>Specialization: {selectedHandyman.specialization.join(', ')}</p>
               <p>Account Status: {selectedHandyman.accounts_status}</p>

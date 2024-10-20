@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import axios from 'axios';
 import DataTable from 'react-data-table-component';
-import './reportstyles.css';
+import './ViewReports.css';  // Custom CSS for table styling
 
 const ViewReports = () => {
     const [reports, setReports] = useState([]);
@@ -94,37 +94,45 @@ const ViewReports = () => {
         {
             name: 'Actions',
             cell: row => (
-                <>
-                    <Button variant="primary" onClick={() => handleShowModal(row)}>View Details</Button>
+                <div className="d-flex flex-column">
+                    <Button variant="primary" className="mb-2" onClick={() => handleShowModal(row)}>View Details</Button>
                     {row.reported_by === 'handyman' ? (
                         <>
-                            <Button variant="danger" onClick={() => handleSuspendHandyman(row.handymanId._id, row._id)}>Suspend Handyman</Button>
-                            <Button variant="warning" onClick={() => handleSendWarning(row)}>Send Warning</Button>
+                            <Button variant="danger" className="mb-2" onClick={() => handleSuspendHandyman(row.handymanId._id, row._id)}>Suspend Handyman</Button>
+                            <Button variant="warning" className="mb-2" onClick={() => handleSendWarning(row)}>Send Warning</Button>
                         </>
                     ) : (
                         <>
-                            <Button variant="danger" onClick={() => handleSuspendUser(row.userId._id, row._id)}>Suspend User</Button>
-                            <Button variant="warning" onClick={() => handleSendWarning(row)}>Send Warning</Button>
+                            <Button variant="danger" className="mb-2" onClick={() => handleSuspendUser(row.userId._id, row._id)}>Suspend User</Button>
+                            <Button variant="warning" className="mb-2" onClick={() => handleSendWarning(row)}>Send Warning</Button>
                         </>
                     )}
-                </>
+                </div>
             ),
         },
     ];
 
     return (
-        <div className="view-reports-container text-center">
-            <h2 className="view-reports-title">Pending Reports</h2>
-            <div className="table-responsive">
-                <DataTable
-                    columns={columns}
-                    data={reports}
-                    pagination
-                    highlightOnHover
-                    customStyles={{
-                        table: { margin: '0 auto' }, // Center the table
-                    }}
-                />
+        <div className="container-fluid">
+            <div className="row">
+                <div className="col-12">
+                    <h2 className="view-reports-title">Pending Reports</h2>
+                    <div className="table-responsive">
+                        <DataTable
+                            columns={columns}
+                            data={reports}
+                            pagination
+                            highlightOnHover
+                            customStyles={{
+                                table: {
+                                    style: {
+                                        width: '100%',
+                                    },
+                                },
+                            }}
+                        />
+                    </div>
+                </div>
             </div>
 
             {selectedReport && (
